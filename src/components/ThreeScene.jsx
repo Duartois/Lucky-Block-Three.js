@@ -9,8 +9,6 @@ function ThreeScene() {
         const mount = mountRef.current;
         if (!mount) return;
 
-        // Espera o layout estabilizar (gambiarra confiável)
-        setTimeout(() => {
             const width = window.innerWidth;
             const height = window.innerHeight;
 
@@ -45,14 +43,21 @@ function ThreeScene() {
             const animate = () => {
                 requestAnimationFrame(animate);
                 controls.update();
+                controls.enableDamping = true; // Habilita o damping
                 controls.autoRotate = true; // Habilita a rotação automática
                 renderer.render(scene, camera);
                 console.log(requestAnimationFrame);
             };
             animate();
 
-        }, 0); // ou use 50ms se precisar garantir ainda mais
-
+        return () => {
+                window.removeEventListener('resize', handleResize);
+                renderer.dispose();
+                while (mount.firstChild) {
+                    mount.removeChild(mount.firstChild);
+                
+            }
+        };
     }, []);
 
     return <div ref={mountRef} style={{ width: innerWidth, height: innerHeight }} />;
